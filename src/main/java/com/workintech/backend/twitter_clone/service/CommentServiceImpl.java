@@ -4,6 +4,9 @@ import com.workintech.backend.twitter_clone.dto.CommentResponse;
 import com.workintech.backend.twitter_clone.entity.Comment;
 import com.workintech.backend.twitter_clone.entity.Tweet;
 import com.workintech.backend.twitter_clone.entity.User;
+import com.workintech.backend.twitter_clone.exception.TweetNotFoundException;
+import com.workintech.backend.twitter_clone.exception.UnauthorizedActionException;
+import com.workintech.backend.twitter_clone.exception.UserNotFoundException;
 import com.workintech.backend.twitter_clone.mapper.CommentMapper;
 import com.workintech.backend.twitter_clone.repository.CommentRepository;
 import com.workintech.backend.twitter_clone.repository.TweetRepository;
@@ -26,9 +29,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse addComment(String userName, Long tweetId, Comment comment) {
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
         Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı!"));
+                .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
         comment.setUser(user);
         comment.setTweet(tweet);
@@ -41,10 +44,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse updateComment(Long id, String userName, Comment updated) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Yorum bulunamadı!"));
+                .orElseThrow(() -> new TweetNotFoundException("Yorum bulunamadı!"));
 
         if (!comment.getUser().getUserName().equals(userName)) {
-            throw new RuntimeException("Bu yorumu sadece sahibi düzenleyebilir!");
+            throw new UnauthorizedActionException("Bu yorumu sadece sahibi düzenleyebilir!");
         }
 
         comment.setContent(updated.getContent());
@@ -55,13 +58,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteComment(Long id, String userName) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Yorum bulunamadı!"));
+                .orElseThrow(() -> new TweetNotFoundException("Yorum bulunamadı!"));
 
         String commentOwner = comment.getUser().getUserName();
         String tweetOwner = comment.getTweet().getUser().getUserName();
 
         if (!userName.equals(commentOwner) && !userName.equals(tweetOwner)) {
-            throw new RuntimeException("Bu yorumu yalnızca tweet veya yorum sahibi silebilir!");
+            throw new UnauthorizedActionException("Bu yorumu yalnızca tweet veya yorum sahibi silebilir!");
         }
 
         commentRepository.delete(comment);
@@ -70,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponse> getCommentsByTweet(Long tweetId) {
         Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı!"));
+                .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
         return commentRepository.findByTweet(tweet)
                 .stream()

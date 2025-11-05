@@ -4,11 +4,15 @@ import com.workintech.backend.twitter_clone.dto.RetweetResponse;
 import com.workintech.backend.twitter_clone.entity.Retweet;
 import com.workintech.backend.twitter_clone.entity.Tweet;
 import com.workintech.backend.twitter_clone.entity.User;
+import com.workintech.backend.twitter_clone.exception.ApiException;
+import com.workintech.backend.twitter_clone.exception.TweetNotFoundException;
+import com.workintech.backend.twitter_clone.exception.UserNotFoundException;
 import com.workintech.backend.twitter_clone.mapper.RetweetMapper;
 import com.workintech.backend.twitter_clone.repository.RetweetRepository;
 import com.workintech.backend.twitter_clone.repository.TweetRepository;
 import com.workintech.backend.twitter_clone.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,12 +26,12 @@ public class RetweetServiceImpl implements RetweetService {
     @Override
     public RetweetResponse retweet(String userName, Long tweetId) {
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
         Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı!"));
+                .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
         if (retweetRepository.existsByUserAndTweet(user, tweet)) {
-            throw new RuntimeException("Bu tweet zaten retweet edilmiş!");
+            throw new ApiException("Bu tweet zaten retweet edilmiş!", HttpStatus.BAD_REQUEST);
         }
 
         Retweet retweet = new Retweet();
@@ -43,12 +47,12 @@ public class RetweetServiceImpl implements RetweetService {
     @Override
     public void undoRetweet(String userName, Long tweetId) {
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
         Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı!"));
+                .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
         Retweet retweet = retweetRepository.findByUserAndTweet(user, tweet)
-                .orElseThrow(() -> new RuntimeException("Retweet bulunamadı!"));
+                .orElseThrow(() -> new ApiException("Retweet bulunamadı!", HttpStatus.NOT_FOUND));
 
         retweetRepository.delete(retweet);
     }

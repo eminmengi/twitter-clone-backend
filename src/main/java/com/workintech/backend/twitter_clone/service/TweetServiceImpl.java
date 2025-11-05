@@ -3,6 +3,9 @@ package com.workintech.backend.twitter_clone.service;
 import com.workintech.backend.twitter_clone.dto.TweetResponse;
 import com.workintech.backend.twitter_clone.entity.Tweet;
 import com.workintech.backend.twitter_clone.entity.User;
+import com.workintech.backend.twitter_clone.exception.TweetNotFoundException;
+import com.workintech.backend.twitter_clone.exception.UnauthorizedActionException;
+import com.workintech.backend.twitter_clone.exception.UserNotFoundException;
 import com.workintech.backend.twitter_clone.mapper.TweetMapper;
 import com.workintech.backend.twitter_clone.repository.TweetRepository;
 import com.workintech.backend.twitter_clone.repository.UserRepository;
@@ -29,7 +32,7 @@ public class TweetServiceImpl implements TweetService {
     public TweetResponse createTweet(String userName, Tweet tweet) {
         // Tweet atmaya çalışan kullanıcıyı bul
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
 
         // Tweet bilgilerini set et
         tweet.setUser(user);
@@ -46,7 +49,7 @@ public class TweetServiceImpl implements TweetService {
     public List<TweetResponse> getTweetsByUserName(String userName) {
         // Kullanıcıyı bul
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
 
         // Kullanıcının tweetlerini getir
         List<Tweet> tweets = tweetRepository.findByUser(user);
@@ -61,11 +64,11 @@ public class TweetServiceImpl implements TweetService {
     public void deleteTweet(Long id, String userName) {
         // Silinmek istenen tweet'i bul
         Tweet tweet = tweetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı!"));
+                .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
         // Sadece tweet sahibi silebilir
         if (!tweet.getUser().getUserName().equals(userName)) {
-            throw new RuntimeException("Bu tweeti sadece sahibi silebilir!");
+            throw new UnauthorizedActionException("Bu tweeti sadece sahibi silebilir!");
         }
 
         tweetRepository.delete(tweet);

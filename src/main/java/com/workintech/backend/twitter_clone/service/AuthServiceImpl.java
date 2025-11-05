@@ -2,10 +2,14 @@ package com.workintech.backend.twitter_clone.service;
 
 import com.workintech.backend.twitter_clone.dto.UserResponse;
 import com.workintech.backend.twitter_clone.entity.User;
+import com.workintech.backend.twitter_clone.exception.ApiException;
+import com.workintech.backend.twitter_clone.exception.UnauthorizedActionException;
+import com.workintech.backend.twitter_clone.exception.UserNotFoundException;
 import com.workintech.backend.twitter_clone.mapper.UserMapper;
 import com.workintech.backend.twitter_clone.repository.UserRepository;
 import com.workintech.backend.twitter_clone.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +28,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserResponse register(User user) {
         userRepository.findByUserName(user.getUserName()).ifPresent(u -> {
-            throw new RuntimeException("Bu kullanıcı adı zaten kullanılıyor!");
+            throw new ApiException("Bu kullanıcı adı zaten kullanılıyor!", HttpStatus.CONFLICT);
         });
         userRepository.findByEmail(user.getEmail()).ifPresent(u -> {
-            throw new RuntimeException("Bu e-posta zaten kayıtlı!");
+            throw new ApiException("Bu e-posta zaten kayıtlı!", HttpStatus.CONFLICT);
         });
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -40,10 +44,10 @@ public class AuthServiceImpl implements AuthService {
     public String login(String userNameOrEmail, String password) {
         User user = userRepository.findByUserName(userNameOrEmail)
                 .or(() -> userRepository.findByEmail(userNameOrEmail))
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Şifre hatalı!");
+            throw new UnauthorizedActionException("Şifre hatalı!");
         }
 
         // JWT üret ve dön

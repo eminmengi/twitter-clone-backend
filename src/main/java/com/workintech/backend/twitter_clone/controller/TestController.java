@@ -8,6 +8,6 @@ public class TestController {
 
     @GetMapping("/api/secure")
     public String secureEndpoint() {
-        return "Bu sayfa sadece giriş yapmış kullanıcıya görünür ✅";
+        return "Bu sayfa sadece giriş yapmış kullanıcıya görünür";
     }
 }

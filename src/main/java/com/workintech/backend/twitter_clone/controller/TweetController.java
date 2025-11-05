@@ -1,5 +1,6 @@
 package com.workintech.backend.twitter_clone.controller;
 
+import com.workintech.backend.twitter_clone.dto.TweetResponse;
 import com.workintech.backend.twitter_clone.entity.Tweet;
 import com.workintech.backend.twitter_clone.service.TweetService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import java.util.List;
  * Tweet CRUD işlemlerini yönetir.
  * Bu endpoint'ler sadece JWT ile giriş yapmış kullanıcılar içindir.
  */
-
 @RestController
 @RequestMapping("/api/tweet")
 @RequiredArgsConstructor
@@ -23,22 +23,22 @@ public class TweetController {
 
     // 🔹 Tweet oluşturma
     @PostMapping
-    public ResponseEntity<Tweet> createTweet(@RequestBody Tweet tweet, Authentication authentication) {
+    public ResponseEntity<TweetResponse> createTweet(@RequestBody Tweet tweet, Authentication authentication) {
         String userName = authentication.getName(); // JWT'den alınan username
-        Tweet saved = tweetService.createTweet(userName, tweet);
+        TweetResponse saved = tweetService.createTweet(userName, tweet);
         return ResponseEntity.ok(saved);
     }
 
     // 🔹 Kullanıcının tweetlerini listeleme
     @GetMapping("/findByUserName/{userName}")
-    public ResponseEntity<List<Tweet>> getTweetsByUser(@PathVariable String userName) {
-        List<Tweet> tweets = tweetService.getTweetsByUserName(userName);
+    public ResponseEntity<List<TweetResponse>> getTweetsByUser(@PathVariable String userName) {
+        List<TweetResponse> tweets = tweetService.getTweetsByUserName(userName);
         return ResponseEntity.ok(tweets);
     }
 
     // 🔹 Tweet silme
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTweet(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<String> deleteTweet(@PathVariable Long id, Authentication authentication) {
         String userName = authentication.getName();
         tweetService.deleteTweet(id, userName);
         return ResponseEntity.ok("Tweet silindi ✅");

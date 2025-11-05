@@ -1,5 +1,6 @@
 package com.workintech.backend.twitter_clone.service;
 
+import com.workintech.backend.twitter_clone.dto.UserResponse;
 import com.workintech.backend.twitter_clone.entity.User;
 
 /**
@@ -7,8 +8,6 @@ import com.workintech.backend.twitter_clone.entity.User;
  * Gerçek işlemler AuthServiceImpl'de uygulanır.
  */
 public interface AuthService {
-
-    User register(User user);
-
-    User login(String userNameOrEmail, String password);
+    UserResponse register(User user);
+    String login(String userNameOrEmail, String password);
 }

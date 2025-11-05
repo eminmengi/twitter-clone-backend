@@ -1,5 +1,6 @@
 package com.workintech.backend.twitter_clone.controller;
 
+import com.workintech.backend.twitter_clone.dto.UserResponse;
 import com.workintech.backend.twitter_clone.entity.User;
 import com.workintech.backend.twitter_clone.security.JwtService;
 import com.workintech.backend.twitter_clone.service.AuthService;
@@ -14,27 +15,24 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtService jwtService;
 
+    // 🔹 Register
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody User user) {
-        User savedUser = authService.register(user);
-        return ResponseEntity.ok(savedUser);
+    public ResponseEntity<UserResponse> register(@RequestBody User user) {
+        UserResponse response = authService.register(user);
+        return ResponseEntity.ok(response);
     }
 
+    // 🔹 Login (token döner)
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestParam String userNameOrEmail,
                                    @RequestParam String password) {
-
-        User loggedInUser = authService.login(userNameOrEmail, password);
-        String token = jwtService.generateToken(loggedInUser.getUserName());
-
-        // Token JSON olarak döndürülür
+        String token = authService.login(userNameOrEmail, password);
         return ResponseEntity.ok(
-                java.util.Map.of(
-                        "accessToken", token,
-                        "tokenType", "Bearer"
-                )
+                new Object() {
+                    public final String accessToken = token;
+                    public final String tokenType = "Bearer";
+                }
         );
     }
 }

@@ -1,14 +1,17 @@
 package com.workintech.backend.twitter_clone.service;
 
+import com.workintech.backend.twitter_clone.dto.UserResponse;
 import com.workintech.backend.twitter_clone.entity.User;
+import com.workintech.backend.twitter_clone.mapper.UserMapper;
 import com.workintech.backend.twitter_clone.repository.UserRepository;
+import com.workintech.backend.twitter_clone.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * AuthService interface'inin implementasyonu.
- * Kullanıcı kayıt ve giriş işlemlerini gerçekleştirir.
+ * Kullanıcı kayıt & giriş işlemleri.
+ * DTO ve JWT mantığı ile çalışır.
  */
 @Service
 @RequiredArgsConstructor
@@ -16,37 +19,34 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
-    public User register(User user) {
-        // Benzersizlik kontrolleri
+    public UserResponse register(User user) {
         userRepository.findByUserName(user.getUserName()).ifPresent(u -> {
             throw new RuntimeException("Bu kullanıcı adı zaten kullanılıyor!");
         });
-
         userRepository.findByEmail(user.getEmail()).ifPresent(u -> {
-            throw new RuntimeException("Bu e-posta adresi zaten kayıtlı!");
+            throw new RuntimeException("Bu e-posta zaten kayıtlı!");
         });
 
-        // Şifreyi hash'le
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User saved = userRepository.save(user);
 
-        // Kaydet
-        return userRepository.save(user);
+        return UserMapper.toDto(saved);
     }
 
     @Override
-    public User login(String userNameOrEmail, String password) {
-        // Username veya email ile kullanıcıyı bul
+    public String login(String userNameOrEmail, String password) {
         User user = userRepository.findByUserName(userNameOrEmail)
                 .or(() -> userRepository.findByEmail(userNameOrEmail))
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
 
-        // Şifre kontrolü
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Şifre hatalı!");
         }
 
-        return user;
+        // JWT üret ve dön
+        return jwtService.generateToken(user.getUserName());
     }
 }

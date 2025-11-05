@@ -1,0 +1,34 @@
+package com.workintech.backend.twitter_clone.controller;
+
+import com.workintech.backend.twitter_clone.dto.RetweetResponse;
+import com.workintech.backend.twitter_clone.service.RetweetService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/retweet")
+@RequiredArgsConstructor
+public class RetweetController {
+
+    private final RetweetService retweetService;
+
+    // 🔁 Retweet at
+    @PostMapping("/{tweetId}")
+    public ResponseEntity<RetweetResponse> retweet(@PathVariable Long tweetId,
+                                                   Authentication authentication) {
+        String userName = authentication.getName();
+        RetweetResponse response = retweetService.retweet(userName, tweetId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 🔁 Retweet'i geri al
+    @DeleteMapping("/{tweetId}")
+    public ResponseEntity<String> undoRetweet(@PathVariable Long tweetId,
+                                              Authentication authentication) {
+        String userName = authentication.getName();
+        retweetService.undoRetweet(userName, tweetId);
+        return ResponseEntity.ok("Retweet kaldırıldı ✅");
+    }
+}

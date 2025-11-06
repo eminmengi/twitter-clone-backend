@@ -16,19 +16,22 @@ public class RetweetController {
 
     // 🔁 Retweet at
     @PostMapping("/{tweetId}")
-    public ResponseEntity<RetweetResponse> retweet(@PathVariable Long tweetId,
-                                                   Authentication authentication) {
+    public ResponseEntity<RetweetResponse> retweet(
+            @PathVariable Long tweetId,
+            Authentication authentication
+    ) {
         String userName = authentication.getName();
-        RetweetResponse response = retweetService.retweet(userName, tweetId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(retweetService.retweet(userName, tweetId));
     }
 
     // 🔁 Retweet'i geri al
     @DeleteMapping("/{tweetId}")
-    public ResponseEntity<String> undoRetweet(@PathVariable Long tweetId,
-                                              Authentication authentication) {
+    public ResponseEntity<String> undoRetweet(
+            @PathVariable Long tweetId,
+            Authentication authentication
+    ) {
         String userName = authentication.getName();
         retweetService.undoRetweet(userName, tweetId);
-        return ResponseEntity.ok("Retweet kaldırıldı ✅");
+        return ResponseEntity.ok("Retweet kaldırıldı");
     }
 }

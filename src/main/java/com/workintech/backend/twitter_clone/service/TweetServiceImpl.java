@@ -7,8 +7,7 @@ import com.workintech.backend.twitter_clone.exception.TweetNotFoundException;
 import com.workintech.backend.twitter_clone.exception.UnauthorizedActionException;
 import com.workintech.backend.twitter_clone.exception.UserNotFoundException;
 import com.workintech.backend.twitter_clone.mapper.TweetMapper;
-import com.workintech.backend.twitter_clone.repository.TweetRepository;
-import com.workintech.backend.twitter_clone.repository.UserRepository;
+import com.workintech.backend.twitter_clone.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * TweetService interface'inin implementasyonu.
  * Burada Tweet ile ilgili iş mantığı (business logic) yer alır.
- * Geri dönüş tipi artık DTO (TweetResponse) olmalıdır.
+ * Geri dönüş tipi DTO (TweetResponse) kullanır.
  */
 @Service
 @RequiredArgsConstructor
@@ -27,22 +26,23 @@ public class TweetServiceImpl implements TweetService {
 
     private final TweetRepository tweetRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
+    private final RetweetRepository retweetRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public TweetResponse createTweet(String userName, Tweet tweet) {
-        // Tweet atmaya çalışan kullanıcıyı bul
+        // Tweet atan kullanıcıyı bul
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
 
-        // Tweet bilgilerini set et
         tweet.setUser(user);
         tweet.setCreatedAt(LocalDateTime.now());
 
-        // Veritabanına kaydet
         Tweet savedTweet = tweetRepository.save(tweet);
 
-        // Entity -> DTO dönüşümü
-        return TweetMapper.toDto(savedTweet);
+        // 🔹 Mapper üzerinden tweet bilgilerini DTO olarak dön
+        return TweetMapper.toDto(savedTweet, user, likeRepository, retweetRepository, commentRepository);
     }
 
     @Override
@@ -54,23 +54,40 @@ public class TweetServiceImpl implements TweetService {
         // Kullanıcının tweetlerini getir
         List<Tweet> tweets = tweetRepository.findByUser(user);
 
-        // Hepsini DTO’ya çevirip döndür
+        // 🔹 Mapper ile DTO'ya çevir (beğeni + retweet + yorum bilgisiyle)
         return tweets.stream()
-                .map(TweetMapper::toDto)
+                .map(tweet -> TweetMapper.toDto(tweet, user, likeRepository, retweetRepository, commentRepository))
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteTweet(Long id, String userName) {
-        // Silinmek istenen tweet'i bul
         Tweet tweet = tweetRepository.findById(id)
                 .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
-        // Sadece tweet sahibi silebilir
+        // Silme yetkisi kontrolü
         if (!tweet.getUser().getUserName().equals(userName)) {
             throw new UnauthorizedActionException("Bu tweeti sadece sahibi silebilir!");
         }
 
         tweetRepository.delete(tweet);
+    }
+
+    @Override
+    public List<Tweet> getTweetsByUser(String userName) {
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
+        return tweetRepository.findByUser(user);
+    }
+    @Override
+    public List<TweetResponse> getAllTweets(String currentUserName) {
+        User currentUser = userRepository.findByUserName(currentUserName)
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
+
+        List<Tweet> allTweets = tweetRepository.findAllByOrderByCreatedAtDesc();
+
+        return allTweets.stream()
+                .map(tweet -> TweetMapper.toDto(tweet, currentUser, likeRepository, retweetRepository, commentRepository))
+                .collect(Collectors.toList());
     }
 }

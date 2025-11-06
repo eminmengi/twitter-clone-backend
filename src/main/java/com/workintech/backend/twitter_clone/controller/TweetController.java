@@ -4,16 +4,14 @@ import com.workintech.backend.twitter_clone.dto.TweetResponse;
 import com.workintech.backend.twitter_clone.entity.Tweet;
 import com.workintech.backend.twitter_clone.service.TweetService;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Tweet CRUD işlemlerini yönetir.
- * Bu endpoint'ler sadece JWT ile giriş yapmış kullanıcılar içindir.
- */
+
 @RestController
 @RequestMapping("/api/tweet")
 @RequiredArgsConstructor
@@ -43,4 +41,13 @@ public class TweetController {
         tweetService.deleteTweet(id, userName);
         return ResponseEntity.ok("Tweet silindi ✅");
     }
+
+    // 🔹 Tüm tweetleri listele
+    @GetMapping
+    public ResponseEntity<List<TweetResponse>> getAllTweets(Authentication authentication) {
+        String currentUserName = authentication.getName();
+        List<TweetResponse> tweets = tweetService.getAllTweets(currentUserName);
+        return ResponseEntity.ok(tweets);
+    }
+
 }

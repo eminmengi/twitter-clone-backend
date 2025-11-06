@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Tweet ve sahibi hakkında minimal bilgi döner.
+ * Tweet ve sahibi hakkında minimal + etkileşim bilgilerini döner.
  */
 @Data
 @NoArgsConstructor
@@ -18,4 +18,15 @@ public class TweetResponse {
     private String userName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Beğeni bilgileri
+    private boolean likedByCurrentUser;
+    private long totalLikes;
+
+    // Retweet bilgileri
+    private boolean retweetedByCurrentUser;
+    private long totalRetweets;
+
+    // Yorum bilgileri
+    private long totalComments;
 }

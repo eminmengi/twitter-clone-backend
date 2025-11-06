@@ -1,5 +1,6 @@
 package com.workintech.backend.twitter_clone.security;
 
+import com.workintech.backend.twitter_clone.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +63,26 @@ public class JwtService {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    /**
+     * Token belirtilen kullanıcıya mı ait? Ve hala geçerli mi?
+     */
+    public boolean isTokenValid(String token, User user) {
+        try {
+            final String username = extractUserName(token);
+            return (username.equals(user.getUserName()) && !isTokenExpired(token));
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Token süresi dolmuş mu?
+     */
+    private boolean isTokenExpired(String token) {
+        Date expiration = parseClaims(token).getBody().getExpiration();
+        return expiration.before(new Date());
     }
 
     /**

@@ -36,7 +36,7 @@ public class Comment {
     private Tweet tweet;
 
     // Yorumu yazan kullanıcı
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER) // Burayı EAGER yapıyoruz ki silerken user null olmasın
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

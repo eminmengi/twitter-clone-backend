@@ -11,6 +11,7 @@ import com.workintech.backend.twitter_clone.mapper.CommentMapper;
 import com.workintech.backend.twitter_clone.repository.CommentRepository;
 import com.workintech.backend.twitter_clone.repository.TweetRepository;
 import com.workintech.backend.twitter_clone.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +56,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toDto(commentRepository.save(comment));
     }
 
+    @Transactional
     @Override
     public void deleteComment(Long id, String userName) {
         Comment comment = commentRepository.findById(id)

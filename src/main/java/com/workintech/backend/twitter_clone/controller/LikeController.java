@@ -14,7 +14,7 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    // 🔹 Tweet beğen
+    //Tweet beğen
     @PostMapping("/{tweetId}")
     public ResponseEntity<LikeResponse> likeTweet(@PathVariable Long tweetId, Authentication authentication) {
         String userName = authentication.getName();
@@ -22,7 +22,7 @@ public class LikeController {
         return ResponseEntity.ok(response);
     }
 
-    // 🔹 Tweet beğeniyi geri al (dislike)
+    //Tweet beğenisini geri al
     @DeleteMapping("/{tweetId}")
     public ResponseEntity<String> dislikeTweet(@PathVariable Long tweetId, Authentication authentication) {
         String userName = authentication.getName();

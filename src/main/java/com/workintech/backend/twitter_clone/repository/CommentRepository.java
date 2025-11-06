@@ -12,4 +12,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Belirli bir tweet'e ait yorumlar
     List<Comment> findByTweet(Tweet tweet);
+
+    // Tweet'e ait toplam yorum sayısını döner
+    long countByTweet(Tweet tweet);
 }

@@ -11,6 +11,7 @@ import com.workintech.backend.twitter_clone.mapper.LikeMapper;
 import com.workintech.backend.twitter_clone.repository.LikeRepository;
 import com.workintech.backend.twitter_clone.repository.TweetRepository;
 import com.workintech.backend.twitter_clone.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,35 +25,46 @@ public class LikeServiceImpl implements LikeService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public LikeResponse likeTweet(String userName, Long tweetId) {
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
+        // 🔹 Eğer kullanıcı zaten beğendiyse -> dislike olarak ele al
         if (likeRepository.existsByUserAndTweet(user, tweet)) {
-            throw new ApiException("Bu tweet zaten beğenilmiş!", HttpStatus.BAD_REQUEST);
+            // mevcut beğeniyi kaldır
+            likeRepository.findByUserAndTweet(user, tweet)
+                    .ifPresent(likeRepository::delete);
+        } else {
+            // yeni beğeni kaydı oluştur
+            Like like = new Like();
+            like.setUser(user);
+            like.setTweet(tweet);
+            likeRepository.save(like);
         }
 
-        Like like = new Like();
-        like.setUser(user);
-        like.setTweet(tweet);
-        Like saved = likeRepository.save(like);
-
+        // 🔹 Güncel toplam beğeni sayısını hesapla
         long totalLikes = likeRepository.countByTweet(tweet);
-        return LikeMapper.toDto(saved, totalLikes);
+
+        // 🔹 DTO dön
+        Like dummy = new Like();
+        dummy.setTweet(tweet);
+        dummy.setUser(user);
+
+        return LikeMapper.toDto(dummy, totalLikes);
     }
 
     @Override
+    @Transactional
     public void dislikeTweet(String userName, Long tweetId) {
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı!"));
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
-        Like like = likeRepository.findByUserAndTweet(user, tweet)
-                .orElseThrow(() -> new ApiException("Beğeni bulunamadı!", HttpStatus.NOT_FOUND));
-
-        likeRepository.delete(like);
+        likeRepository.findByUserAndTweet(user, tweet)
+                .ifPresent(likeRepository::delete);
     }
 }

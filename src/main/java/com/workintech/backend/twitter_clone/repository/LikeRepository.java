@@ -13,5 +13,5 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     boolean existsByUserAndTweet(User user, Tweet tweet);
     Optional<Like> findByUserAndTweet(User user, Tweet tweet);
-    long countByTweet(Tweet tweet); // toplam beğeni sayısı
+    long countByTweet(Tweet tweet);
 }

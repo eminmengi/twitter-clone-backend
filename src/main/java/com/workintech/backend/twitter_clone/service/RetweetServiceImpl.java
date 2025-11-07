@@ -36,7 +36,7 @@ public class RetweetServiceImpl implements RetweetService {
             throw new ApiException("Bu tweet zaten retweet edilmiş!", HttpStatus.BAD_REQUEST);
         }
 
-        // 🔹 RT tweet olarak yeni Tweet kaydı oluştur
+        //RT tweet olarak yeni Tweet kaydı oluştur
         Tweet retweetTweet = new Tweet();
         retweetTweet.setUser(user);
         retweetTweet.setCreatedAt(LocalDateTime.now());
@@ -44,13 +44,13 @@ public class RetweetServiceImpl implements RetweetService {
 
         Tweet savedRetweetTweet = tweetRepository.save(retweetTweet);
 
-        // 🔹 Retweet tablosuna da kaydet (ilişki takibi için)
+        //Retweet tablosuna da kaydet (ilişki takibi için)
         Retweet retweet = new Retweet();
         retweet.setUser(user);
         retweet.setTweet(original);
         retweetRepository.save(retweet);
 
-        // 🔹 Geriye yeni tweet gibi dön
+        //Geriye yeni tweet gibi dön
         return TweetMapper.toDto(savedRetweetTweet, user, likeRepository, retweetRepository, commentRepository);
     }
 

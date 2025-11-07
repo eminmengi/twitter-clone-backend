@@ -13,7 +13,6 @@ import java.util.Map;
 
 /**
  * Bu sınıf uygulama genelindeki hataları yakalar ve düzgün JSON döner.
- * Örneğin RuntimeException fırlatıldığında 400 Bad Request veya 409 Conflict gibi dönebilir.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {

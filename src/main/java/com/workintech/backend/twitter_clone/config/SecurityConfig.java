@@ -46,8 +46,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
-
-                        // 👇 tweet uçları
                         .requestMatchers(HttpMethod.GET,  "/api/tweet/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/tweet").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/tweet/**").authenticated()

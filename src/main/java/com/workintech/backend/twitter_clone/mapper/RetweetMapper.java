@@ -10,7 +10,7 @@ public class RetweetMapper {
         String userName = null;
         Long tweetId = null;
 
-        // 🔹 Güvenli erişim (LazyInitializationException önleme)
+        //LazyInitializationException önleme
         try {
             if (retweet.getUser() != null) {
                 userName = retweet.getUser().getUserName();

@@ -4,7 +4,6 @@ import com.workintech.backend.twitter_clone.dto.LikeResponse;
 import com.workintech.backend.twitter_clone.entity.Like;
 import com.workintech.backend.twitter_clone.entity.Tweet;
 import com.workintech.backend.twitter_clone.entity.User;
-import com.workintech.backend.twitter_clone.exception.ApiException;
 import com.workintech.backend.twitter_clone.exception.TweetNotFoundException;
 import com.workintech.backend.twitter_clone.exception.UserNotFoundException;
 import com.workintech.backend.twitter_clone.mapper.LikeMapper;
@@ -13,7 +12,6 @@ import com.workintech.backend.twitter_clone.repository.TweetRepository;
 import com.workintech.backend.twitter_clone.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +30,7 @@ public class LikeServiceImpl implements LikeService {
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new TweetNotFoundException("Tweet bulunamadı!"));
 
-        // 🔹 Eğer kullanıcı zaten beğendiyse -> dislike olarak ele al
+        // Eğer kullanıcı zaten beğendiyse -> dislike olarak ele al
         if (likeRepository.existsByUserAndTweet(user, tweet)) {
             // mevcut beğeniyi kaldır
             likeRepository.findByUserAndTweet(user, tweet)
@@ -45,10 +43,10 @@ public class LikeServiceImpl implements LikeService {
             likeRepository.save(like);
         }
 
-        // 🔹 Güncel toplam beğeni sayısını hesapla
+        //Güncel toplam beğeni sayısını hesapla
         long totalLikes = likeRepository.countByTweet(tweet);
 
-        // 🔹 DTO dön
+        // DTO dön
         Like dummy = new Like();
         dummy.setTweet(tweet);
         dummy.setUser(user);

@@ -77,7 +77,7 @@ public class TweetServiceImpl implements TweetService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ Yeni retweet metodu eklendi
+
     @Override
     public TweetResponse retweet(String userName, Long tweetId) {
         User user = userRepository.findByUserName(userName)

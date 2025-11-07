@@ -17,7 +17,7 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // 🔹 Yorum ekleme
+    //Yorum ekleme
     @PostMapping("/{tweetId}")
     public ResponseEntity<CommentResponse> addComment(@PathVariable Long tweetId,
                                                       @RequestBody Comment comment,
@@ -27,7 +27,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-    // 🔹 Yorum güncelleme
+    //Yorum güncelleme
     @PutMapping("/{id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id,
                                                          @RequestBody Comment comment,
@@ -37,7 +37,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-    // 🔹 Yorum silme
+    //Yorum silme
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteComment(@PathVariable Long id,
                                                 Authentication authentication) {
@@ -46,7 +46,7 @@ public class CommentController {
         return ResponseEntity.ok("Yorum silindi ✅");
     }
 
-    // 🔹 Tweet'e ait yorumları listeleme
+    //Tweet'e ait yorumları listeleme
     @GetMapping("/tweet/{tweetId}")
     public ResponseEntity<List<CommentResponse>> getCommentsByTweet(@PathVariable Long tweetId) {
         List<CommentResponse> comments = commentService.getCommentsByTweet(tweetId);

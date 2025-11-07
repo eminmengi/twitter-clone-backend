@@ -36,7 +36,7 @@ public class TweetMapper {
 
         long totalLikes = likeRepository.countByTweet(tweet);
         long totalRetweets = retweetRepository.countByTweet(tweet);
-        long totalComments = commentRepository.countByTweet(tweet); // ✅ yeni eklendi
+        long totalComments = commentRepository.countByTweet(tweet);
 
         return new TweetResponse(
                 tweet.getId(),

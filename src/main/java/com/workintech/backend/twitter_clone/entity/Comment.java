@@ -10,9 +10,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Bir Tweet'e yapılan kullanıcı yorumlarını temsil eder.
- */
 @Getter
 @Setter
 @NoArgsConstructor

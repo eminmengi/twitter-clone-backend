@@ -10,7 +10,7 @@ public class CommentMapper {
         String userName = null;
         Long tweetId = null;
 
-        // 🔹 Hibernate Lazy proxy hatasına karşı güvenli kontroller
+        //Hibernate Lazy proxy hatasına karşı
         try {
             if (comment.getUser() != null) {
                 userName = comment.getUser().getUserName();

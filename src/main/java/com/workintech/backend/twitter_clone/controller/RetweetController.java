@@ -1,6 +1,6 @@
 package com.workintech.backend.twitter_clone.controller;
 
-import com.workintech.backend.twitter_clone.dto.RetweetResponse;
+import com.workintech.backend.twitter_clone.dto.TweetResponse;
 import com.workintech.backend.twitter_clone.service.RetweetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +14,18 @@ public class RetweetController {
 
     private final RetweetService retweetService;
 
-    // 🔁 Retweet at
+    // Retweet at
     @PostMapping("/{tweetId}")
-    public ResponseEntity<RetweetResponse> retweet(
+    public ResponseEntity<TweetResponse> retweet(
             @PathVariable Long tweetId,
             Authentication authentication
     ) {
         String userName = authentication.getName();
+        // TweetResponse dönecek
         return ResponseEntity.ok(retweetService.retweet(userName, tweetId));
     }
 
-    // 🔁 Retweet'i geri al
+    // Retweet'i geri al
     @DeleteMapping("/{tweetId}")
     public ResponseEntity<String> undoRetweet(
             @PathVariable Long tweetId,

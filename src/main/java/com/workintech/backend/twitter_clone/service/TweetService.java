@@ -21,4 +21,6 @@ public interface TweetService {
     //    Not: Bu metot, controller’ın currentUser & likeRepository ile
     //    likedByCurrentUser/totalLikes hesaplamasını yapabilmesi için eklendi.
     List<Tweet> getTweetsByUser(String userName);
+
+    TweetResponse retweet(String userName, Long tweetId);
 }

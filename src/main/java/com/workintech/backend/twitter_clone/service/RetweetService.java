@@ -1,8 +1,8 @@
 package com.workintech.backend.twitter_clone.service;
 
-import com.workintech.backend.twitter_clone.dto.RetweetResponse;
+import com.workintech.backend.twitter_clone.dto.TweetResponse;
 
 public interface RetweetService {
-    RetweetResponse retweet(String userName, Long tweetId);
+    TweetResponse retweet(String userName, Long tweetId);
     void undoRetweet(String userName, Long tweetId);
 }

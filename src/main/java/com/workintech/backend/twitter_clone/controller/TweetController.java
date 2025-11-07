@@ -50,4 +50,11 @@ public class TweetController {
         return ResponseEntity.ok(tweets);
     }
 
+    @PostMapping("/retweet/{tweetId}")
+    public ResponseEntity<TweetResponse> retweet(@PathVariable Long tweetId, Authentication authentication) {
+        String userName = authentication.getName();
+        TweetResponse response = tweetService.retweet(userName, tweetId);
+        return ResponseEntity.ok(response);
+    }
+
 }
